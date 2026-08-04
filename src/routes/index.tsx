@@ -93,7 +93,8 @@ function Diagnostico() {
   }
 
   if (stage === "intro") return <Intro onStart={() => setStage("quiz")} />;
-  if (stage === "computing") return <Computing />;
+  if (stage === "computing")
+    return <Computing answers={answers} onDone={() => setStage("result")} />;
   if (stage === "result") return <Result answers={answers} onRestart={restart} />;
 
   return (
