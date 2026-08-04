@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      raiox_respostas: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nome: string
+          p1: string | null
+          p2: string | null
+          p3: string | null
+          p4: string | null
+          p5: string | null
+          p6: string | null
+          resultado: string
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome: string
+          p1?: string | null
+          p2?: string | null
+          p3?: string | null
+          p4?: string | null
+          p5?: string | null
+          p6?: string | null
+          resultado: string
+          whatsapp: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string
+          p1?: string | null
+          p2?: string | null
+          p3?: string | null
+          p4?: string | null
+          p5?: string | null
+          p6?: string | null
+          resultado?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
