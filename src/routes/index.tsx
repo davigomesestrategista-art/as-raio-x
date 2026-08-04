@@ -13,13 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Diagnóstico da Autopeça | Onde sua loja está perdendo dinheiro" },
+      { title: "Diagnóstico da Sua Autopeça | Onde sua loja perde dinheiro" },
       {
         name: "description",
         content:
           "Responda 6 perguntas e descubra em 2 minutos o que está travando o lucro da sua loja de autopeças.",
       },
-      { property: "og:title", content: "Diagnóstico da Autopeça | Loja de autopeças" },
+      { property: "og:title", content: "Diagnóstico da Sua Autopeça" },
       {
         property: "og:description",
         content:
@@ -45,6 +45,10 @@ function Diagnostico() {
     const next = { ...answers, [q.id]: key };
     setAnswers(next);
     if (q.id === 1 && key === "c") {
+      setStage("result");
+      return;
+    }
+    if (q.id === 3 && key === "d") {
       setStage("result");
       return;
     }
@@ -109,7 +113,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
     <div className="sticky top-0 z-10 bg-accent">
       <div className="mx-auto flex max-w-xl items-center justify-between px-5 py-2.5">
         <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-accent-foreground">
-          Diagnóstico da Autopeça
+          Diagnóstico da Sua Autopeça
         </span>
         <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-accent-foreground">
           {current}/{total}
@@ -163,7 +167,7 @@ function Intro({ onStart }: { onStart: () => void }) {
 function Result({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const key = resolveResult(answers);
   const c = getResultContent(key);
-  const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[5]);
+  const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[3]);
 
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
