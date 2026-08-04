@@ -167,26 +167,67 @@ function Diagnostico() {
   );
 }
 
-function Computing() {
-  const [pct, setPct] = useState(15);
+const FADE = 180;
+
+function Computing({ answers, onDone }: { answers: Answers; onDone: () => void }) {
+  const p2 = questions[1]!.options.find((o) => o.key === answers[2])?.label ?? "";
+  const p4 = questions[3]!.options.find((o) => o.key === answers[4])?.label ?? "";
+
+  const lines: { text: string; ms: number }[] = [
+    { text: "Analisando suas respostas...", ms: 500 },
+    { text: `Entendemos: ${p2}.`, ms: 1000 },
+    { text: "Cruzando com seu faturamento...", ms: 500 },
+    { text: `${p4} e ainda travado nisso.`, ms: 800 },
+    { text: "Buscando o padrão em mais de 1.000 autopeças...", ms: 700 },
+    { text: "Diagnóstico pronto.", ms: 600 },
+  ];
+
+  const total = lines.reduce((s, l) => s + l.ms, 0);
+
+  const [i, setI] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [pct, setPct] = useState(6);
+
   useEffect(() => {
     const t = setTimeout(() => setPct(100), 60);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const line = lines[i];
+    if (!line) return;
+    setVisible(true);
+    const out = setTimeout(() => setVisible(false), Math.max(line.ms - FADE, 60));
+    const next = setTimeout(() => {
+      if (i === lines.length - 1) onDone();
+      else setI(i + 1);
+    }, line.ms);
+    return () => {
+      clearTimeout(out);
+      clearTimeout(next);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i]);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-ink px-6 text-ink-foreground">
-      <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-accent">
-        Cruzando suas respostas...
+      <p
+        className={`min-h-[3.5rem] max-w-sm text-center font-mono text-[13px] uppercase leading-relaxed tracking-[0.22em] text-accent transition-opacity duration-150 ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {lines[i]?.text}
       </p>
       <div className="mt-6 h-1 w-full max-w-xs overflow-hidden rounded-full bg-ink-foreground/15">
         <div
-          className="h-full bg-accent transition-all duration-[1400ms] ease-out"
-          style={{ width: `${pct}%` }}
+          className="h-full bg-accent ease-linear"
+          style={{ width: `${pct}%`, transition: `width ${total}ms linear` }}
         />
       </div>
     </main>
   );
 }
+
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   return (
