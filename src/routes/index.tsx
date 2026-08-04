@@ -70,7 +70,7 @@ function Diagnostico() {
     setTimeout(() => setLeaving(true), 260);
     setTimeout(() => {
       if (isLast) {
-        goToResult();
+        goToResult(next);
       } else {
         setStep(step + 1);
       }
