@@ -95,7 +95,9 @@ export function resolveResult(a: Answers): ResultKey {
   return "METODO";
 }
 
-type Cta = { label: string; href: string; variant: "primary" | "ghost" };
+type Cta =
+  | { label: string; kind: "link"; href: string; variant: "primary" | "ghost" }
+  | { label: string; kind: "whats"; perfil: string; variant: "primary" | "ghost" };
 
 export type ResultContent = {
   badge: string;
