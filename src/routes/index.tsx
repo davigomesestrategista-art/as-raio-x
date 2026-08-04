@@ -43,10 +43,15 @@ function Diagnostico() {
 
   const q = questions[step]!;
 
-  function goToResult() {
+  function goToResult(final: Answers) {
+    // Sem P2/P4 não dá pra montar as linhas dinâmicas: vai direto pro resultado.
+    if (final[1] === "c" || final[3] === "d") {
+      setStage("result");
+      return;
+    }
     setStage("computing");
-    setTimeout(() => setStage("result"), 1600);
   }
+
 
   function pick(key: string) {
     if (selected) return;
@@ -65,7 +70,7 @@ function Diagnostico() {
     setTimeout(() => setLeaving(true), 260);
     setTimeout(() => {
       if (isLast) {
-        goToResult();
+        goToResult(next);
       } else {
         setStep(step + 1);
       }
@@ -88,7 +93,8 @@ function Diagnostico() {
   }
 
   if (stage === "intro") return <Intro onStart={() => setStage("quiz")} />;
-  if (stage === "computing") return <Computing />;
+  if (stage === "computing")
+    return <Computing answers={answers} onDone={() => setStage("result")} />;
   if (stage === "result") return <Result answers={answers} onRestart={restart} />;
 
   return (
@@ -161,26 +167,67 @@ function Diagnostico() {
   );
 }
 
-function Computing() {
-  const [pct, setPct] = useState(15);
+const FADE = 180;
+
+function Computing({ answers, onDone }: { answers: Answers; onDone: () => void }) {
+  const p2 = questions[1]!.options.find((o) => o.key === answers[2])?.label ?? "";
+  const p4 = questions[3]!.options.find((o) => o.key === answers[4])?.label ?? "";
+
+  const lines: { text: string; ms: number }[] = [
+    { text: "Analisando suas respostas...", ms: 500 },
+    { text: `Entendemos: ${p2}.`, ms: 1000 },
+    { text: "Cruzando com seu faturamento...", ms: 500 },
+    { text: `${p4} e ainda travado nisso.`, ms: 800 },
+    { text: "Buscando o padrão em mais de 1.000 autopeças...", ms: 700 },
+    { text: "Diagnóstico pronto.", ms: 600 },
+  ];
+
+  const total = lines.reduce((s, l) => s + l.ms, 0);
+
+  const [i, setI] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [pct, setPct] = useState(6);
+
   useEffect(() => {
     const t = setTimeout(() => setPct(100), 60);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const line = lines[i];
+    if (!line) return;
+    setVisible(true);
+    const out = setTimeout(() => setVisible(false), Math.max(line.ms - FADE, 60));
+    const next = setTimeout(() => {
+      if (i === lines.length - 1) onDone();
+      else setI(i + 1);
+    }, line.ms);
+    return () => {
+      clearTimeout(out);
+      clearTimeout(next);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i]);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-ink px-6 text-ink-foreground">
-      <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-accent">
-        Cruzando suas respostas...
+      <p
+        className={`min-h-[3.5rem] max-w-sm text-center font-mono text-[13px] uppercase leading-relaxed tracking-[0.22em] text-accent transition-opacity duration-150 ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {lines[i]?.text}
       </p>
       <div className="mt-6 h-1 w-full max-w-xs overflow-hidden rounded-full bg-ink-foreground/15">
         <div
-          className="h-full bg-accent transition-all duration-[1400ms] ease-out"
-          style={{ width: `${pct}%` }}
+          className="h-full bg-accent ease-linear"
+          style={{ width: `${pct}%`, transition: `width ${total}ms linear` }}
         />
       </div>
     </main>
   );
 }
+
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   return (
@@ -243,10 +290,33 @@ function Intro({ onStart }: { onStart: () => void }) {
   );
 }
 
+function Rise({
+  delay,
+  className,
+  as: Tag = "div",
+  children,
+}: {
+  delay: number;
+  className?: string;
+  as?: "div" | "p" | "h1";
+  children: React.ReactNode;
+}) {
+  return (
+    <Tag
+      className={`animate-rise-in ${className ?? ""}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
 function Result({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const key = resolveResult(answers);
   const c = getResultContent(key);
   const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[3]);
+  const urgenciaAlta = answers[4] === "c" || answers[4] === "d" || answers[3] === "b";
+
 
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -294,42 +364,64 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
       </div>
 
       <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8">
-        <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
-          {c.badge}
-        </span>
+        <Rise delay={0} className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
+            {c.badge}
+          </span>
+          <span
+            className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] ${
+              urgenciaAlta
+                ? "bg-accent text-accent-foreground"
+                : "bg-accent/15 text-foreground"
+            }`}
+          >
+            {urgenciaAlta ? "Urgência: Alta" : "Urgência: Moderada"}
+          </span>
+        </Rise>
 
-        <h1 className="mt-4 font-display text-[30px] uppercase leading-[1.02] tracking-tight text-foreground sm:text-4xl">
+        <Rise delay={160} as="h1" className="mt-4 font-display text-[30px] uppercase leading-[1.02] tracking-tight text-foreground sm:text-4xl">
           {c.title[0]} {c.title[1]} <span className="text-accent">{c.title[2]}</span>
           {c.title[3]}
-        </h1>
+        </Rise>
 
-        <div className="mt-7 rounded-xl border border-border bg-card p-5">
+        <Rise delay={320} className="mt-7 rounded-xl border border-border bg-card p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que você achava
           </p>
-          <p className="mt-1 text-[15px] text-muted-foreground line-through">{c.wrong}</p>
+          <p className="relative mt-1 inline-block text-[15px] text-muted-foreground">
+            {c.wrong}
+            <span
+              aria-hidden="true"
+              className="animate-strike-draw absolute left-0 top-1/2 h-px w-full bg-muted-foreground"
+              style={{ animationDelay: "620ms", animationFillMode: "both" }}
+            />
+          </p>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que o diagnóstico mostra
           </p>
           <p className="mt-1 text-[15px] font-semibold text-accent">{c.right}</p>
-        </div>
+        </Rise>
 
-        <p className="mt-6 text-[15px] leading-relaxed text-foreground/80">{c.body}</p>
+        <Rise delay={480} as="p" className="mt-6 text-[15px] leading-relaxed text-foreground/80">
+          {c.body}
+        </Rise>
         {extra && (
-          <p className="mt-3 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70">
+          <Rise delay={640} as="p" className="mt-3 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70">
             {extra}
-          </p>
+          </Rise>
         )}
 
         {!enviado && (
+          <Rise delay={extra ? 800 : 640}>
           <form
             onSubmit={enviar}
             className="mt-8 rounded-xl border border-border bg-card p-5"
             noValidate
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Libere seu diagnóstico completo
+              Isso foi o diagnóstico. O que fazer a partir daqui, você libera abaixo.
             </p>
+
             <div className="mt-4 flex flex-col gap-3">
               <input
                 value={nome}
@@ -353,12 +445,14 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
             <button
               type="submit"
               disabled={enviando}
-              className="mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
+              className="animate-soft-pulse mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
             >
               {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
             </button>
           </form>
+          </Rise>
         )}
+
 
         {enviado && (
           <div className="mt-8 flex flex-col gap-3">
