@@ -422,12 +422,14 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
             <button
               type="submit"
               disabled={enviando}
-              className="mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
+              className="animate-soft-pulse mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
             >
               {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
             </button>
           </form>
+          </Rise>
         )}
+
 
         {enviado && (
           <div className="mt-8 flex flex-col gap-3">
