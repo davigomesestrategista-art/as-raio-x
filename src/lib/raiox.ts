@@ -13,7 +13,7 @@ export const whats = (texto: string) =>
   `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
 
 export const whatsComNome = (nome: string, perfil: string) =>
-  whats(`Oi, sou ${nome}, fiz o Diagnóstico da Autopeça e caí no perfil ${perfil}`);
+  whats(`Oi, sou ${nome}, fiz o Diagnóstico da Sua Autopeça e caí no perfil ${perfil}`);
 
 export type Answers = Record<number, string>;
 
@@ -31,7 +31,30 @@ export const questions = [
   },
   {
     id: 2,
-    title: ["Qual o", "faturamento", "médio mensal da sua loja hoje?"],
+    title: ["O que mais te", "trava", " hoje?"],
+    options: [
+      { key: "a", label: "Compro no achismo, não sei se a peça vai girar" },
+      { key: "b", label: "Dou desconto no escuro e a margem some" },
+      {
+        key: "c",
+        label: "Minha operação é bagunça: estoque, processo e financeiro fora de controle",
+      },
+      { key: "d", label: "Já sei operar, não sei como crescer de verdade" },
+    ],
+  },
+  {
+    id: 3,
+    title: ["Você já tentou", "resolver isso", " antes?"],
+    options: [
+      { key: "a", label: "Não tentei ainda" },
+      { key: "b", label: "Tentei sozinho, YouTube ou dica de grupo, nunca virou sistema" },
+      { key: "c", label: "Já comprei uma planilha ou produto de entrada do Yago" },
+      { key: "d", label: "Já sou aluno do Método Peça.com" },
+    ],
+  },
+  {
+    id: 4,
+    title: ["Qual o", "faturamento", " médio mensal da sua loja hoje?"],
     options: [
       { key: "a", label: "Até R$20 mil" },
       { key: "b", label: "R$20 mil a R$60 mil" },
@@ -40,21 +63,8 @@ export const questions = [
     ],
   },
   {
-    id: 3,
-    title: ["O que mais te", "trava", "hoje?"],
-    options: [
-      { key: "a", label: "Não sei precificar direito, sinto que deixo dinheiro na mesa" },
-      { key: "b", label: "Não sei onde comprar peça barata e certa" },
-      {
-        key: "c",
-        label: "Minha operação é bagunçada: sem controle de processo, time ou financeiro",
-      },
-      { key: "d", label: "Já sei operar, não sei como escalar" },
-    ],
-  },
-  {
-    id: 4,
-    title: ["Se alguém te desse a", "solução certa", "amanhã, você:"],
+    id: 5,
+    title: ["Se alguém te desse a", "solução certa", " amanhã, você:"],
     options: [
       { key: "a", label: "Aplicaria sozinho com um material ou planilha" },
       { key: "b", label: "Pagaria por um sistema completo pra implementar com apoio" },
@@ -62,17 +72,8 @@ export const questions = [
     ],
   },
   {
-    id: 5,
-    title: ["Você já tentou resolver isso", "sozinho", "antes?"],
-    options: [
-      { key: "a", label: "Não tentei ainda" },
-      { key: "b", label: "Tentei e não resolveu" },
-      { key: "c", label: "Tentei, resolvi em parte, mas travou de novo" },
-    ],
-  },
-  {
     id: 6,
-    title: ["Você pensa em abrir", "mais lojas", "nos próximos 12 meses?"],
+    title: ["Você pensa em abrir", "mais lojas", " nos próximos 12 meses?"],
     options: [
       { key: "a", label: "Não, foco é essa loja" },
       { key: "b", label: "Sim, quero abrir mais 1 ou 2" },
@@ -83,13 +84,14 @@ export const questions = [
 
 export function resolveResult(a: Answers): ResultKey {
   if (a[1] === "c") return "ASPIRANTE";
-  if (a[2] === "d" || a[6] === "c") return "PIKA";
-  if (a[4] === "c" && a[2] !== "a") return "METODO";
-  if (a[2] === "a") return "PLANILHA";
-  if (a[2] === "b") {
-    if (a[3] === "a") return "PLANILHA";
-    if (a[3] === "b") return "REFERENCIA";
-    if (a[3] === "c") return "GI";
+  if (a[3] === "d") return "METODO";
+  if (a[4] === "d" || a[6] === "c") return "PIKA";
+  if (a[5] === "c" && a[4] !== "a") return "METODO";
+  if (a[4] === "a") return "PLANILHA";
+  if (a[4] === "b") {
+    if (a[2] === "a") return "REFERENCIA";
+    if (a[2] === "b") return "PLANILHA";
+    if (a[2] === "c") return "GI";
     return "METODO";
   }
   return "METODO";
