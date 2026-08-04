@@ -217,10 +217,10 @@ export function getResultContent(key: ResultKey): ResultContent {
   }
 }
 
-export const linhaTentativa = (p5?: string) => {
-  if (p5 === "b")
-    return "Você já tentou resolver isso por conta e não saiu do lugar — não foi falta de esforço, foi falta de método.";
-  if (p5 === "c")
-    return "Você já resolveu em parte e travou de novo — isso é sinal de solução solta, sem sistema por trás.";
+export const linhaTentativa = (p3?: string) => {
+  if (p3 === "b")
+    return "Você já tentou por conta, no YouTube e em dica de grupo, e nunca virou sistema — não foi falta de esforço, foi falta de método.";
+  if (p3 === "c")
+    return "Você já pegou um material de entrada e resolveu em parte, mas travou de novo — isso é sinal de solução solta, sem sistema por trás.";
   return null;
 };
