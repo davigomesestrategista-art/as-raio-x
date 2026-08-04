@@ -132,8 +132,9 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 function Intro({ onStart }: { onStart: () => void }) {
   return (
     <main className="flex min-h-screen flex-col bg-ink px-5 py-10 text-ink-foreground">
-      <span className="inline-flex w-fit rounded-full border border-accent/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-accent">
-        Pra dono de autopeça que sente que tá travado
+      <span className="inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full border border-accent bg-accent/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+        <span className="text-accent" aria-hidden="true">●</span>
+        Pra dono de autopeça travado
       </span>
 
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-14">
