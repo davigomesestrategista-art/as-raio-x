@@ -139,15 +139,18 @@ function Intro({ onStart }: { onStart: () => void }) {
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-14">
         <h1 className="font-display text-[38px] uppercase leading-[0.95] tracking-tight sm:text-5xl">
           <span className="block text-ink-foreground/45 line-through decoration-2">
-            Sua autopeça não tá sem sorte.
+            Sua autopeça não tá sem esforço.
           </span>
           <span className="mt-2 block">
             Ela tá <span className="text-accent">sem diagnóstico</span>.
           </span>
         </h1>
         <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-foreground/70">
-          Estoque parado, margem que some, caixa apertado. 6 perguntas pra descobrir exatamente
-          onde tá o vazamento da sua loja e o que fazer sobre isso agora.
+          Estoque parado, margem que some, caixa apertado.{" "}
+          <strong className="text-ink-foreground">
+            6 perguntas pra descobrir exatamente onde tá o vazamento da sua loja
+          </strong>{" "}
+          e o que fazer sobre isso agora.
         </p>
 
         <button
