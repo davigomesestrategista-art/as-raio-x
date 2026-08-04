@@ -37,7 +37,7 @@ function RaioX() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
 
-  const q = questions[step];
+  const q = questions[step]!;
 
   function pick(key: string) {
     const next = { ...answers, [q.id]: key };
