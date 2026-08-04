@@ -341,42 +341,64 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
       </div>
 
       <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8">
-        <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
-          {c.badge}
-        </span>
+        <Rise delay={0} className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
+            {c.badge}
+          </span>
+          <span
+            className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] ${
+              urgenciaAlta
+                ? "bg-accent text-accent-foreground"
+                : "bg-accent/15 text-foreground"
+            }`}
+          >
+            {urgenciaAlta ? "Urgência: Alta" : "Urgência: Moderada"}
+          </span>
+        </Rise>
 
-        <h1 className="mt-4 font-display text-[30px] uppercase leading-[1.02] tracking-tight text-foreground sm:text-4xl">
+        <Rise delay={160} as="h1" className="mt-4 font-display text-[30px] uppercase leading-[1.02] tracking-tight text-foreground sm:text-4xl">
           {c.title[0]} {c.title[1]} <span className="text-accent">{c.title[2]}</span>
           {c.title[3]}
-        </h1>
+        </Rise>
 
-        <div className="mt-7 rounded-xl border border-border bg-card p-5">
+        <Rise delay={320} className="mt-7 rounded-xl border border-border bg-card p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que você achava
           </p>
-          <p className="mt-1 text-[15px] text-muted-foreground line-through">{c.wrong}</p>
+          <p className="relative mt-1 inline-block text-[15px] text-muted-foreground">
+            {c.wrong}
+            <span
+              aria-hidden="true"
+              className="animate-strike-draw absolute left-0 top-1/2 h-px w-full bg-muted-foreground"
+              style={{ animationDelay: "620ms", animationFillMode: "both" }}
+            />
+          </p>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que o diagnóstico mostra
           </p>
           <p className="mt-1 text-[15px] font-semibold text-accent">{c.right}</p>
-        </div>
+        </Rise>
 
-        <p className="mt-6 text-[15px] leading-relaxed text-foreground/80">{c.body}</p>
+        <Rise delay={480} as="p" className="mt-6 text-[15px] leading-relaxed text-foreground/80">
+          {c.body}
+        </Rise>
         {extra && (
-          <p className="mt-3 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70">
+          <Rise delay={640} as="p" className="mt-3 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70">
             {extra}
-          </p>
+          </Rise>
         )}
 
         {!enviado && (
+          <Rise delay={extra ? 800 : 640}>
           <form
             onSubmit={enviar}
             className="mt-8 rounded-xl border border-border bg-card p-5"
             noValidate
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Libere seu diagnóstico completo
+              Isso foi o diagnóstico. O que fazer a partir daqui, você libera abaixo.
             </p>
+
             <div className="mt-4 flex flex-col gap-3">
               <input
                 value={nome}
