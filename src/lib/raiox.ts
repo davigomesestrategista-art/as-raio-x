@@ -12,6 +12,9 @@ export const withOrigem = (link: string, origem: string) =>
 export const whats = (texto: string) =>
   `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
 
+export const whatsComNome = (nome: string, perfil: string) =>
+  whats(`Oi, sou ${nome}, fiz o Diagnóstico da Autopeça e caí no perfil ${perfil}`);
+
 export type Answers = Record<number, string>;
 
 export type ResultKey = "ASPIRANTE" | "PLANILHA" | "REFERENCIA" | "GI" | "METODO" | "PIKA";
@@ -92,7 +95,9 @@ export function resolveResult(a: Answers): ResultKey {
   return "METODO";
 }
 
-type Cta = { label: string; href: string; variant: "primary" | "ghost" };
+type Cta =
+  | { label: string; kind: "link"; href: string; variant: "primary" | "ghost" }
+  | { label: string; kind: "whats"; perfil: string; variant: "primary" | "ghost" };
 
 export type ResultContent = {
   badge: string;
@@ -115,6 +120,7 @@ export function getResultContent(key: ResultKey): ResultContent {
         ctas: [
           {
             label: "Quero o Mapa",
+            kind: "link",
             href: withOrigem(LINK_MAPA, "raiox_aspirante"),
             variant: "primary",
           },
@@ -130,6 +136,7 @@ export function getResultContent(key: ResultKey): ResultContent {
         ctas: [
           {
             label: "Quero a Planilha",
+            kind: "link",
             href: withOrigem(LINK_PLANILHA, "raiox_planilha"),
             variant: "primary",
           },
@@ -145,6 +152,7 @@ export function getResultContent(key: ResultKey): ResultContent {
         ctas: [
           {
             label: "Quero acessar",
+            kind: "link",
             href: withOrigem(LINK_REFERENCIA, "raiox_referencia"),
             variant: "primary",
           },
@@ -160,6 +168,7 @@ export function getResultContent(key: ResultKey): ResultContent {
         ctas: [
           {
             label: "Quero o Sistema GI",
+            kind: "link",
             href: withOrigem(LINK_GI, "raiox_gi"),
             variant: "primary",
           },
@@ -174,13 +183,15 @@ export function getResultContent(key: ResultKey): ResultContent {
         body: "Você já sabe tocar a loja no dia a dia. O próximo degrau não é esforço, é estrutura: compra, precificação, estoque e time funcionando junto, com alguém acompanhando a implementação.",
         ctas: [
           {
-            label: "Assistir a aula gratuita",
-            href: withOrigem(LINK_VSL_METODO, "raiox_metodo"),
+            label: "Quero acelerar",
+            kind: "whats",
+            perfil: "RAIOX-METODO-ASCENSAO",
             variant: "primary",
           },
           {
-            label: "Já entrar na lista da call",
-            href: whats("RAIOX-METODO-ASCENSAO"),
+            label: "Assistir a aula gratuita",
+            kind: "link",
+            href: withOrigem(LINK_VSL_METODO, "raiox_metodo"),
             variant: "ghost",
           },
         ],
@@ -194,8 +205,9 @@ export function getResultContent(key: ResultKey): ResultContent {
         body: "No seu patamar o gargalo muda de lugar: padronização entre unidades, poder de compra, gente pra tocar sem você e caixa pra bancar a expansão. Isso se resolve conversando caso a caso.",
         ctas: [
           {
-            label: "Falar com a equipe agora",
-            href: whats("RAIOX-PIKA-IMERSAO"),
+            label: "Quero acelerar",
+            kind: "whats",
+            perfil: "RAIOX-PIKA-IMERSAO",
             variant: "primary",
           },
         ],

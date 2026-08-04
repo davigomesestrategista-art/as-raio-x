@@ -5,19 +5,21 @@ import {
   resolveResult,
   getResultContent,
   linhaTentativa,
+  whatsComNome,
   type Answers,
 } from "@/lib/raiox";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Raio-X do Negócio | Diagnóstico para loja de autopeças" },
+      { title: "Diagnóstico da Autopeça | Onde sua loja está perdendo dinheiro" },
       {
         name: "description",
         content:
           "Responda 6 perguntas e descubra em 2 minutos o que está travando o lucro da sua loja de autopeças.",
       },
-      { property: "og:title", content: "Raio-X do Negócio | Loja de autopeças" },
+      { property: "og:title", content: "Diagnóstico da Autopeça | Loja de autopeças" },
       {
         property: "og:description",
         content:
@@ -27,12 +29,12 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: RaioX,
+  component: Diagnostico,
 });
 
 type Stage = "intro" | "quiz" | "result";
 
-function RaioX() {
+function Diagnostico() {
   const [stage, setStage] = useState<Stage>("intro");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -107,7 +109,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
     <div className="sticky top-0 z-10 bg-accent">
       <div className="mx-auto flex max-w-xl items-center justify-between px-5 py-2.5">
         <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-accent-foreground">
-          Raio-X do Negócio
+          Diagnóstico da Autopeça
         </span>
         <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-accent-foreground">
           {current}/{total}
@@ -127,26 +129,31 @@ function Intro({ onStart }: { onStart: () => void }) {
   return (
     <main className="flex min-h-screen flex-col bg-ink px-5 py-10 text-ink-foreground">
       <span className="inline-flex w-fit rounded-full border border-accent/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-accent">
-        Raio-X do Negócio
+        Pra dono de autopeça que sente que tá travado
       </span>
 
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-14">
         <h1 className="font-display text-[38px] uppercase leading-[0.95] tracking-tight sm:text-5xl">
-          Descubra o que está <span className="text-accent">travando</span> sua loja
+          <span className="block text-ink-foreground/45 line-through decoration-2">
+            Sua autopeça não tá sem sorte.
+          </span>
+          <span className="mt-2 block">
+            Ela tá <span className="text-accent">sem diagnóstico</span>.
+          </span>
         </h1>
         <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-foreground/70">
-          6 perguntas, 2 minutos. No fim você vê onde sua loja de autopeças está perdendo dinheiro
-          e o que resolver primeiro. Sem e-mail, sem enrolação.
+          Estoque parado, margem que some, caixa apertado. 6 perguntas pra descobrir exatamente
+          onde tá o vazamento da sua loja e o que fazer sobre isso agora.
         </p>
 
         <button
           onClick={onStart}
           className="mt-9 w-full rounded-xl bg-accent px-6 py-4 font-display text-base uppercase tracking-tight text-accent-foreground transition-transform hover:brightness-95 active:scale-[0.99]"
         >
-          Começar o Raio-X
+          Começar o Diagnóstico
         </button>
         <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-foreground/40">
-          Resposta única · sem cadastro
+          Leva 2 minutos.
         </p>
       </div>
     </main>
@@ -156,15 +163,49 @@ function Intro({ onStart }: { onStart: () => void }) {
 function Result({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const key = resolveResult(answers);
   const c = getResultContent(key);
-  const extra =
-    key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[5]);
+  const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[5]);
+
+  const [nome, setNome] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const [enviado, setEnviado] = useState(false);
+
+  async function enviar(e: React.FormEvent) {
+    e.preventDefault();
+    const n = nome.trim();
+    const w = whatsapp.trim();
+    if (!n || !w) {
+      setErro("Preencha nome e WhatsApp.");
+      return;
+    }
+    setEnviando(true);
+    setErro(null);
+    const { error } = await supabase.from("raiox_respostas").insert({
+      nome: n.slice(0, 120),
+      whatsapp: w.slice(0, 40),
+      p1: answers[1] ?? null,
+      p2: answers[2] ?? null,
+      p3: answers[3] ?? null,
+      p4: answers[4] ?? null,
+      p5: answers[5] ?? null,
+      p6: answers[6] ?? null,
+      resultado: key,
+    });
+    setEnviando(false);
+    if (error) {
+      setErro("Não deu pra enviar agora. Tente de novo.");
+      return;
+    }
+    setEnviado(true);
+  }
 
   return (
     <main className="min-h-screen bg-background">
       <div className="bg-accent">
         <div className="mx-auto max-w-xl px-5 py-2.5">
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-accent-foreground">
-            Raio-X concluído
+            Diagnóstico concluído
           </span>
         </div>
       </div>
@@ -185,7 +226,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
           </p>
           <p className="mt-1 text-[15px] text-muted-foreground line-through">{c.wrong}</p>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            O que o raio-x mostra
+            O que o diagnóstico mostra
           </p>
           <p className="mt-1 text-[15px] font-semibold text-accent">{c.right}</p>
         </div>
@@ -197,29 +238,70 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
           </p>
         )}
 
-        <div className="mt-8 flex flex-col gap-3">
-          {c.ctas.map((cta) => (
-            <a
-              key={cta.label}
-              href={cta.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={
-                cta.variant === "primary"
-                  ? "rounded-xl bg-accent px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95"
-                  : "rounded-xl border border-ink/25 bg-background px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-foreground transition hover:bg-card"
-              }
+        {!enviado && (
+          <form
+            onSubmit={enviar}
+            className="mt-8 rounded-xl border border-border bg-card p-5"
+            noValidate
+          >
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              Libere seu diagnóstico completo
+            </p>
+            <div className="mt-4 flex flex-col gap-3">
+              <input
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Seu nome"
+                maxLength={120}
+                required
+                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
+              />
+              <input
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="Seu WhatsApp (com DDD)"
+                inputMode="tel"
+                maxLength={40}
+                required
+                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
+              />
+            </div>
+            {erro && <p className="mt-3 text-[13px] text-destructive">{erro}</p>}
+            <button
+              type="submit"
+              disabled={enviando}
+              className="mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
             >
-              {cta.label}
-            </a>
-          ))}
-        </div>
+              {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
+            </button>
+          </form>
+        )}
+
+        {enviado && (
+          <div className="mt-8 flex flex-col gap-3">
+            {c.ctas.map((cta) => (
+              <a
+                key={cta.label}
+                href={cta.kind === "whats" ? whatsComNome(nome.trim(), cta.perfil) : cta.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={
+                  cta.variant === "primary"
+                    ? "rounded-xl bg-accent px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95"
+                    : "rounded-xl border border-ink/25 bg-background px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-foreground transition hover:bg-card"
+                }
+              >
+                {cta.label}
+              </a>
+            ))}
+          </div>
+        )}
 
         <button
           onClick={onRestart}
           className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
         >
-          Refazer o raio-x
+          Refazer o diagnóstico
         </button>
       </div>
     </main>
