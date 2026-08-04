@@ -12,6 +12,9 @@ export const withOrigem = (link: string, origem: string) =>
 export const whats = (texto: string) =>
   `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
 
+export const whatsComNome = (nome: string, perfil: string) =>
+  whats(`Oi, sou ${nome}, fiz o Diagnóstico da Autopeça e caí no perfil ${perfil}`);
+
 export type Answers = Record<number, string>;
 
 export type ResultKey = "ASPIRANTE" | "PLANILHA" | "REFERENCIA" | "GI" | "METODO" | "PIKA";
