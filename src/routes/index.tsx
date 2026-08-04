@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   questions,
   resolveResult,
@@ -32,46 +32,74 @@ export const Route = createFileRoute("/")({
   component: Diagnostico,
 });
 
-type Stage = "intro" | "quiz" | "result";
+type Stage = "intro" | "quiz" | "computing" | "result";
 
 function Diagnostico() {
   const [stage, setStage] = useState<Stage>("intro");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
+  const [selected, setSelected] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false);
 
   const q = questions[step]!;
 
+  function goToResult() {
+    setStage("computing");
+    setTimeout(() => setStage("result"), 1600);
+  }
+
   function pick(key: string) {
+    if (selected) return;
+    setSelected(key);
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(12);
+    }
     const next = { ...answers, [q.id]: key };
     setAnswers(next);
-    if (q.id === 1 && key === "c") {
-      setStage("result");
-      return;
-    }
-    if (q.id === 3 && key === "d") {
-      setStage("result");
-      return;
-    }
-    if (step === questions.length - 1) {
-      setStage("result");
-      return;
-    }
-    setStep(step + 1);
+
+    const isLast =
+      (q.id === 1 && key === "c") ||
+      (q.id === 3 && key === "d") ||
+      step === questions.length - 1;
+
+    setTimeout(() => setLeaving(true), 260);
+    setTimeout(() => {
+      if (isLast) {
+        goToResult();
+      } else {
+        setStep(step + 1);
+      }
+      setSelected(null);
+      setLeaving(false);
+    }, 420);
   }
 
   function restart() {
     setAnswers({});
     setStep(0);
+    setSelected(null);
+    setLeaving(false);
     setStage("intro");
   }
 
+  function back() {
+    if (selected) return;
+    setStep(step - 1);
+  }
+
   if (stage === "intro") return <Intro onStart={() => setStage("quiz")} />;
+  if (stage === "computing") return <Computing />;
   if (stage === "result") return <Result answers={answers} onRestart={restart} />;
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen overflow-x-hidden bg-background">
       <ProgressBar current={step + 1} total={questions.length} />
-      <div className="mx-auto w-full max-w-xl px-5 pb-16 pt-8">
+      <div
+        key={step}
+        className={`mx-auto w-full max-w-xl px-5 pb-16 pt-8 transition-all duration-200 ease-out ${
+          leaving ? "-translate-x-4 opacity-0" : "translate-x-0 opacity-100 animate-fade-in"
+        }`}
+      >
         <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent">
           Pergunta {String(step + 1).padStart(2, "0")}
         </span>
@@ -81,28 +109,74 @@ function Diagnostico() {
         </h1>
 
         <div className="mt-7 flex flex-col gap-3">
-          {q.options.map((o) => (
-            <button
-              key={o.key}
-              onClick={() => pick(o.key)}
-              className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-xl border border-border bg-card px-4 py-4 text-left transition-colors hover:border-accent hover:bg-accent/10 active:scale-[0.995]"
-            >
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md border border-border bg-background font-mono text-xs uppercase text-muted-foreground">
-                {o.key}
-              </span>
-              <span className="min-w-0 text-[15px] leading-snug text-foreground">{o.label}</span>
-            </button>
-          ))}
+          {q.options.map((o) => {
+            const active = selected === o.key;
+            return (
+              <button
+                key={o.key}
+                onClick={() => pick(o.key)}
+                className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-xl border px-4 py-4 text-left transition-all duration-200 ease-out active:scale-[0.995] ${
+                  active
+                    ? "border-accent bg-accent"
+                    : "border-border bg-card hover:border-accent hover:bg-accent/10"
+                } ${selected && !active ? "opacity-40" : ""}`}
+              >
+                <span
+                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-md border font-mono text-xs uppercase transition-all duration-200 ${
+                    active
+                      ? "border-accent-foreground bg-accent-foreground text-accent"
+                      : "border-border bg-background text-muted-foreground"
+                  }`}
+                >
+                  {active ? (
+                    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+                      <path d="M7.6 14.2 3.9 10.5l1.3-1.3 2.4 2.4 6.2-6.2 1.3 1.3z" />
+                    </svg>
+                  ) : (
+                    o.key
+                  )}
+                </span>
+                <span
+                  className={`min-w-0 text-[15px] leading-snug transition-colors duration-200 ${
+                    active ? "font-semibold text-accent-foreground" : "text-foreground"
+                  }`}
+                >
+                  {o.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {step > 0 && (
           <button
-            onClick={() => setStep(step - 1)}
+            onClick={back}
             className="mt-6 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
           >
             ← Voltar
           </button>
         )}
+      </div>
+    </main>
+  );
+}
+
+function Computing() {
+  const [pct, setPct] = useState(15);
+  useEffect(() => {
+    const t = setTimeout(() => setPct(100), 60);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-ink px-6 text-ink-foreground">
+      <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-accent">
+        Cruzando suas respostas...
+      </p>
+      <div className="mt-6 h-1 w-full max-w-xs overflow-hidden rounded-full bg-ink-foreground/15">
+        <div
+          className="h-full bg-accent transition-all duration-[1400ms] ease-out"
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </main>
   );
@@ -121,13 +195,14 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
       </div>
       <div className="h-1 w-full bg-accent-foreground/20">
         <div
-          className="h-full bg-accent-foreground transition-all duration-300"
+          className="h-full bg-accent-foreground transition-[width] duration-500 ease-out"
           style={{ width: `${(current / total) * 100}%` }}
         />
       </div>
     </div>
   );
 }
+
 
 function Intro({ onStart }: { onStart: () => void }) {
   return (
