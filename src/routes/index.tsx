@@ -43,10 +43,15 @@ function Diagnostico() {
 
   const q = questions[step]!;
 
-  function goToResult() {
+  function goToResult(final: Answers) {
+    // Sem P2/P4 não dá pra montar as linhas dinâmicas: vai direto pro resultado.
+    if (final[1] === "c" || final[3] === "d") {
+      setStage("result");
+      return;
+    }
     setStage("computing");
-    setTimeout(() => setStage("result"), 1600);
   }
+
 
   function pick(key: string) {
     if (selected) return;
