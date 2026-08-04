@@ -290,10 +290,33 @@ function Intro({ onStart }: { onStart: () => void }) {
   );
 }
 
+function Rise({
+  delay,
+  className,
+  as: Tag = "div",
+  children,
+}: {
+  delay: number;
+  className?: string;
+  as?: "div" | "p" | "h1";
+  children: React.ReactNode;
+}) {
+  return (
+    <Tag
+      className={`animate-rise-in ${className ?? ""}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
 function Result({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const key = resolveResult(answers);
   const c = getResultContent(key);
   const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[3]);
+  const urgenciaAlta = answers[4] === "c" || answers[4] === "d" || answers[3] === "b";
+
 
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
