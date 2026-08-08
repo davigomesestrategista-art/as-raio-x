@@ -69,7 +69,7 @@ export const questions = [
     options: [
       { key: "a", label: "Aplicaria sozinho com um material ou planilha" },
       { key: "b", label: "Pagaria por um sistema completo pra implementar com apoio" },
-      { key: "c", label: "Prefiro que alguém monte isso comigo, mesmo pagando mais caro" },
+      { key: "c", label: "Prefiro que alguém monte isso comigo, custe o que custar" },
     ],
   },
   {
