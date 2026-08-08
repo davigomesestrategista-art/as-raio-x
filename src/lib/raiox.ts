@@ -1,7 +1,8 @@
 // Configure aqui os links de checkout / VSL / WhatsApp.
 export const LINK_MAPA = "[LINK_MAPA]";
 export const LINK_PLANILHA = "[LINK_PLANILHA]";
-export const LINK_REFERENCIA = "[LINK_REFERENCIA]";
+export const LINK_PRIMEIRACOMPRA = "[LINK_PRIMEIRACOMPRA]";
+export const LINK_METODO_PRECIFICACAO = "[LINK_METODO_PRECIFICACAO]";
 export const LINK_GI = "[LINK_GI]";
 export const LINK_VSL_METODO = "[LINK_VSL_METODO]";
 export const NUMERO_WHATSAPP = "[NUMERO]";
@@ -17,7 +18,7 @@ export const whatsComNome = (nome: string, perfil: string) =>
 
 export type Answers = Record<number, string>;
 
-export type ResultKey = "ASPIRANTE" | "PLANILHA" | "REFERENCIA" | "GI" | "METODO" | "PIKA";
+export type ResultKey = "ASPIRANTE" | "PLANILHA" | "PRIMEIRACOMPRA" | "GI" | "METODO" | "PIKA";
 
 export const questions = [
   {
@@ -87,11 +88,10 @@ export function resolveResult(a: Answers): ResultKey {
   if (a[3] === "d") return "METODO";
   if (a[4] === "d" || a[6] === "c") return "PIKA";
   if (a[5] === "c" && a[4] !== "a") return "METODO";
-  if (a[4] === "a") return "PLANILHA";
+  if (a[4] === "a") return a[3] === "c" ? "METODO" : "PLANILHA";
   if (a[4] === "b") {
-    if (a[2] === "a") return "REFERENCIA";
-    if (a[2] === "b") return "PLANILHA";
-    if (a[2] === "c") return "GI";
+    if (a[2] === "a") return a[3] === "c" ? "METODO" : "PRIMEIRACOMPRA";
+    if (a[2] === "b") return a[3] === "c" ? "METODO" : "PLANILHA";
     return "METODO";
   }
   return "METODO";
@@ -108,6 +108,7 @@ export type ResultContent = {
   right: string;
   body: string;
   ctas: Cta[];
+  secondary?: { label: string; href: string };
 };
 
 export function getResultContent(key: ResultKey): ResultContent {
@@ -143,19 +144,23 @@ export function getResultContent(key: ResultKey): ResultContent {
             variant: "primary",
           },
         ],
+        secondary: {
+          label: "Já sei precificar, quero ir mais fundo com o Yago e o Ítalo",
+          href: withOrigem(LINK_METODO_PRECIFICACAO, "raiox_planilha_upsell"),
+        },
       };
-    case "REFERENCIA":
+    case "PRIMEIRACOMPRA":
       return {
-        badge: "Resultado: Compra",
-        title: ["O problema está", "antes", "da venda."],
-        wrong: "seu cliente só quer preço baixo",
-        right: "você está comprando caro e culpando o cliente",
-        body: "Comprando na mão do representante errado, sua peça já entra cara na loja. Fornecedor certo, peça certa e condição certa mudam sua margem sem você mexer uma vírgula na venda.",
+        badge: "Resultado: Primeira Compra",
+        title: ["Não é que você compra mal.", "É que ninguém te deu", "uma curva", "."],
+        wrong: "não é que você compra mal",
+        right: "é que ninguém te deu uma curva",
+        body: "Comprar no achismo trava seu caixa em peça parada que não gira. A Planilha de Primeira Compra te dá a curva certa pra saber o que comprar antes de comprar.",
         ctas: [
           {
-            label: "Quero acessar",
+            label: "Quero a Planilha de Primeira Compra",
             kind: "link",
-            href: withOrigem(LINK_REFERENCIA, "raiox_referencia"),
+            href: withOrigem(LINK_PRIMEIRACOMPRA, "raiox_primeiracompra"),
             variant: "primary",
           },
         ],
