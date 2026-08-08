@@ -471,6 +471,16 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
                 {cta.label}
               </a>
             ))}
+            {c.secondary && (
+              <a
+                href={c.secondary.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-center text-[13px] text-muted-foreground underline underline-offset-4 hover:text-foreground"
+              >
+                {c.secondary.label}
+              </a>
+            )}
           </div>
         )}
 
