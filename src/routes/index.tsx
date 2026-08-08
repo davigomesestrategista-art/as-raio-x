@@ -314,12 +314,13 @@ function Rise({
 function Result({ answers, onRestart }: { answers: Answers; onRestart: () => void }) {
   const key = resolveResult(answers);
   const c = getResultContent(key);
-  const extra = key === "ASPIRANTE" || key === "PIKA" ? null : linhaTentativa(answers[3]);
-  const urgenciaAlta = answers[4] === "c" || answers[4] === "d" || answers[3] === "b";
-
+  const chips = buildChips(key, answers);
+  const podeReconhecer = key === "PLANILHA" || key === "PRIMEIRACOMPRA" || key === "METODO";
+  const extra = podeReconhecer ? linhaTentativa(answers[3]) : null;
 
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
@@ -337,6 +338,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
     const { error } = await supabase.from("raiox_respostas").insert({
       nome: n.slice(0, 120),
       whatsapp: w.slice(0, 40),
+      email: email.trim().slice(0, 160) || null,
       p1: answers[1] ?? null,
       p2: answers[2] ?? null,
       p3: answers[3] ?? null,
@@ -353,6 +355,8 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
     setEnviado(true);
   }
 
+  const d = (n: number) => n * 160;
+
   return (
     <main className="min-h-screen bg-background">
       <div className="bg-accent">
@@ -364,98 +368,151 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
       </div>
 
       <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8">
-        <Rise delay={0} className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground">
+        {/* Camada 1 + 2 */}
+        <Rise delay={d(0)} className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground">
             {c.badge}
           </span>
-          <span
-            className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] ${
-              urgenciaAlta
-                ? "bg-accent text-accent-foreground"
-                : "bg-accent/15 text-foreground"
-            }`}
-          >
-            {urgenciaAlta ? "Urgência: Alta" : "Urgência: Moderada"}
+          {c.urgency && (
+            <span
+              className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${
+                c.urgency.tone === "hot"
+                  ? "bg-accent text-accent-foreground"
+                  : "border border-border bg-card text-muted-foreground"
+              }`}
+            >
+              {c.urgency.text}
+            </span>
+          )}
+        </Rise>
+
+        {/* Camada 3 */}
+        <Rise
+          delay={d(1)}
+          as="h1"
+          className="mt-4 font-display text-[28px] uppercase leading-[1.04] tracking-tight text-foreground sm:text-4xl"
+        >
+          <span className="block text-muted-foreground line-through decoration-2">
+            {c.headline.struck}
+          </span>
+          <span className="mt-2 block">
+            {c.headline.pre} <span className="text-accent">{c.headline.accent}</span>
+            {c.headline.post}
           </span>
         </Rise>
 
-        <Rise delay={160} as="h1" className="mt-4 font-display text-[30px] uppercase leading-[1.02] tracking-tight text-foreground sm:text-4xl">
-          {c.title[0]} {c.title[1]} <span className="text-accent">{c.title[2]}</span>
-          {c.title[3]}
-        </Rise>
-
-        <Rise delay={320} className="mt-7 rounded-xl border border-border bg-card p-5">
+        {/* Camada 4 */}
+        <Rise delay={d(2)} className="mt-7 rounded-xl border border-border bg-card p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que você achava
           </p>
           <p className="relative mt-1 inline-block text-[15px] text-muted-foreground">
-            {c.wrong}
+            {c.compare.wrong}
             <span
               aria-hidden="true"
               className="animate-strike-draw absolute left-0 top-1/2 h-px w-full bg-muted-foreground"
-              style={{ animationDelay: "620ms", animationFillMode: "both" }}
+              style={{ animationDelay: `${d(2) + 300}ms`, animationFillMode: "both" }}
             />
           </p>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             O que o diagnóstico mostra
           </p>
-          <p className="mt-1 text-[15px] font-semibold text-accent">{c.right}</p>
+          <p className="mt-1 text-[15px] font-semibold text-accent">{c.compare.right}</p>
         </Rise>
 
-        <Rise delay={480} as="p" className="mt-6 text-[15px] leading-relaxed text-foreground/80">
-          {c.body}
+        {/* Camada 5 */}
+        <Rise delay={d(3)} className="mt-6">
+          <div className="flex flex-wrap gap-2">
+            {chips.map((chip) => (
+              <span
+                key={chip}
+                className="rounded-md border border-border bg-card px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-foreground"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-foreground/80">{c.closing}</p>
         </Rise>
+
+        {/* Camada condicional */}
         {extra && (
-          <Rise delay={640} as="p" className="mt-3 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70">
+          <Rise
+            delay={d(4)}
+            as="p"
+            className="mt-4 border-l-2 border-accent pl-3 text-[15px] leading-relaxed text-foreground/70"
+          >
             {extra}
           </Rise>
         )}
 
-        {!enviado && (
-          <Rise delay={extra ? 800 : 640}>
-          <form
-            onSubmit={enviar}
-            className="mt-8 rounded-xl border border-border bg-card p-5"
-            noValidate
+        {/* Camada 6 */}
+        <Rise delay={d(extra ? 5 : 4)} className="mt-8 flex items-center gap-3">
+          {/* Espaço reservado para a foto real do Yago (substituir por src/assets/yago.jpg). */}
+          <div
+            className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-card font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground"
+            aria-hidden="true"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              Isso foi o diagnóstico. O que fazer a partir daqui, você libera abaixo.
-            </p>
+            Foto
+          </div>
+          <p className="text-[13px] leading-snug text-foreground/70">{c.proofCaption}</p>
+        </Rise>
 
-            <div className="mt-4 flex flex-col gap-3">
-              <input
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Seu nome"
-                maxLength={120}
-                required
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
-              />
-              <input
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="Seu WhatsApp (com DDD)"
-                inputMode="tel"
-                maxLength={40}
-                required
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
-              />
-            </div>
-            {erro && <p className="mt-3 text-[13px] text-destructive">{erro}</p>}
-            <button
-              type="submit"
-              disabled={enviando}
-              className="animate-soft-pulse mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
+        {!enviado && (
+          <Rise delay={d(extra ? 6 : 5)}>
+            <form
+              onSubmit={enviar}
+              className="mt-4 rounded-xl border border-border bg-card p-5"
+              noValidate
             >
-              {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
-            </button>
-          </form>
+              {/* Camada 7 */}
+              <p className="text-[14px] font-semibold leading-snug text-foreground">
+                {c.anticipation}
+              </p>
+
+              {/* Camada 8 */}
+              <div className="mt-4 flex flex-col gap-3">
+                <input
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Seu nome"
+                  maxLength={120}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
+                />
+                <input
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="Seu WhatsApp (com DDD)"
+                  inputMode="tel"
+                  maxLength={40}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
+                />
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Seu e-mail (opcional)"
+                  inputMode="email"
+                  maxLength={160}
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[15px] text-foreground outline-none placeholder:text-muted-foreground focus:border-accent"
+                />
+              </div>
+              {erro && <p className="mt-3 text-[13px] text-destructive">{erro}</p>}
+              <button
+                type="submit"
+                disabled={enviando}
+                className="animate-soft-pulse mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
+              >
+                {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
+              </button>
+            </form>
           </Rise>
         )}
 
-
+        {/* Camada 9 */}
         {enviado && (
-          <div className="mt-8 flex flex-col gap-3">
+          <div className="mt-6 flex animate-rise-in flex-col gap-3">
             {c.ctas.map((cta) => (
               <a
                 key={cta.label}
@@ -464,7 +521,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
                 rel="noopener noreferrer"
                 className={
                   cta.variant === "primary"
-                    ? "rounded-xl bg-accent px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95"
+                    ? "animate-soft-pulse rounded-xl bg-accent px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95"
                     : "rounded-xl border border-ink/25 bg-background px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-foreground transition hover:bg-card"
                 }
               >
@@ -473,7 +530,11 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
             ))}
             {c.secondary && (
               <a
-                href={c.secondary.href}
+                href={
+                  c.secondary.href.startsWith("https://wa.me")
+                    ? whatsComNome(nome.trim(), "RAIOX-METODO-ASCENSAO")
+                    : c.secondary.href
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-center text-[13px] text-muted-foreground underline underline-offset-4 hover:text-foreground"
@@ -494,3 +555,4 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
     </main>
   );
 }
+
