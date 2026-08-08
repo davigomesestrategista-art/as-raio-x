@@ -91,7 +91,7 @@ export const questions = [
 
 export function resolveResult(a: Answers): ResultKey {
   if (a[1] === "c") return "ASPIRANTE";
-  if (a[3] === "d") return "METODO";
+  if (a[3] === "d") return "ASCENSAO";
   if (a[4] === "d" || a[6] === "c") return "PIKA";
   if (a[5] === "c" && a[4] !== "a") return "METODO";
   if (a[4] === "a") return a[3] === "c" ? "METODO" : "PLANILHA";
