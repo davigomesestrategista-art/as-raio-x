@@ -46,7 +46,11 @@ function Diagnostico() {
 
   function goToResult(final: Answers) {
     // Sem P2/P4 não dá pra montar as linhas dinâmicas: vai direto pro resultado.
-    if (final[1] === "c" || final[3] === "d") {
+    // Só ASPIRANTE (P1=c) pula — as perguntas seguintes não se aplicam a quem
+    // não tem loja. Quem já é aluno (P3=d) segue o quiz normal até P6: o
+    // faturamento e a ambição de rede alimentam a conversa de ascensão com
+    // o Ítalo em vez de ele entrar cego.
+    if (final[1] === "c") {
       setStage("result");
       return;
     }
@@ -63,10 +67,7 @@ function Diagnostico() {
     const next = { ...answers, [q.id]: key };
     setAnswers(next);
 
-    const isLast =
-      (q.id === 1 && key === "c") ||
-      (q.id === 3 && key === "d") ||
-      step === questions.length - 1;
+    const isLast = (q.id === 1 && key === "c") || step === questions.length - 1;
 
     setTimeout(() => setLeaving(true), 260);
     setTimeout(() => {
@@ -316,7 +317,11 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
   const key = resolveResult(answers);
   const c = getResultContent(key);
   const chips = buildChips(key, answers);
-  const podeReconhecer = key === "PLANILHA" || key === "PRIMEIRACOMPRA" || key === "METODO";
+  // PLANILHA agora só é alcançada com P3=(a) [nunca tentou], então a linha de
+  // reconhecimento nunca dispararia ali. METODOPRECIFICACAO não precisa: o
+  // resultado inteiro já é construído em cima do reconhecimento (só se chega
+  // ali via P3=b).
+  const podeReconhecer = key === "PRIMEIRACOMPRA" || key === "METODO";
   const extra = podeReconhecer ? linhaTentativa(answers[3]) : null;
 
   const [nome, setNome] = useState("");
