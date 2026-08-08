@@ -4,6 +4,7 @@ import {
   questions,
   resolveResult,
   getResultContent,
+  buildChips,
   linhaTentativa,
   whatsComNome,
   type Answers,
