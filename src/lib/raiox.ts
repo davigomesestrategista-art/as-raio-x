@@ -18,7 +18,13 @@ export const whatsComNome = (nome: string, perfil: string) =>
 
 export type Answers = Record<number, string>;
 
-export type ResultKey = "ASPIRANTE" | "PLANILHA" | "PRIMEIRACOMPRA" | "GI" | "METODO" | "PIKA";
+export type ResultKey =
+  | "ASPIRANTE"
+  | "PLANILHA"
+  | "PRIMEIRACOMPRA"
+  | "METODO"
+  | "PIKA"
+  | "ASCENSAO";
 
 export const questions = [
   {
