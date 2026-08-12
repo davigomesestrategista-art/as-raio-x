@@ -46,6 +46,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -83,6 +85,8 @@
   --muted-foreground: oklch(0.55 0 0);
   --accent: oklch(0.582 0.224 25.6);
   --accent-foreground: oklch(0.98 0 0);
+  --cta: oklch(0.768 0.204 130.8);
+  --cta-foreground: oklch(0.191 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.9 0 0);
@@ -167,6 +171,11 @@
   50% { opacity: 0.92; box-shadow: 0 0 18px 2px color-mix(in oklch, var(--color-accent) 45%, transparent); }
 }
 
+@keyframes soft-pulse-cta {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--color-cta); }
+  50% { opacity: 0.92; box-shadow: 0 0 18px 2px color-mix(in oklch, var(--color-cta) 45%, transparent); }
+}
+
 @utility animate-rise-in {
   opacity: 0;
   animation: rise-in 0.5s ease-out forwards;
@@ -179,4 +188,8 @@
 
 @utility animate-soft-pulse {
   animation: soft-pulse 2.6s ease-in-out infinite;
+}
+
+@utility animate-soft-pulse-cta {
+  animation: soft-pulse-cta 2.6s ease-in-out infinite;
 }
