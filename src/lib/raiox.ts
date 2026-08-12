@@ -5,6 +5,7 @@ export const LINK_PRIMEIRACOMPRA = "[LINK_PRIMEIRACOMPRA]";
 export const LINK_METODO_PRECIFICACAO = "[LINK_METODO_PRECIFICACAO]";
 export const LINK_GI = "[LINK_GI]";
 export const LINK_VSL_METODO = "[LINK_VSL_METODO]";
+export const LINK_VSL_MAPA = "[LINK_VSL_MAPA]";
 export const NUMERO_WHATSAPP = "[NUMERO]";
 
 export const withOrigem = (link: string, origem: string) =>
@@ -156,13 +157,20 @@ export function getResultContent(key: ResultKey): ResultContent {
                         },
                         closing: "O primeiro passo é saber o que comprar antes de gastar o primeiro real.",
                         proofCaption: "Material direto do time do Yago",
-                        anticipation: "Libere abaixo o acesso ao Mapa das Autopeças.",
+                        anticipation:
+                                    "Libere abaixo a aula gratuita e o acesso ao Mapa das Autopeças.",
                         ctas: [
+                          {
+                                        label: "Assistir a aula gratuita",
+                                        kind: "link",
+                                        href: withOrigem(LINK_VSL_MAPA, "raiox_aspirante"),
+                                        variant: "primary",
+                          },
                           {
                                         label: "Quero o Mapa",
                                         kind: "link",
                                         href: withOrigem(LINK_MAPA, "raiox_aspirante"),
-                                        variant: "primary",
+                                        variant: "ghost",
                           },
                                   ],
               };
