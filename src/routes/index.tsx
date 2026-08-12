@@ -326,6 +326,12 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
   const [erro, setErro] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
 
+  useEffect(() => {
+    if (enviado && typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate(20);
+    }
+  }, [enviado]);
+
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     const n = nome.trim();
@@ -433,6 +439,9 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
               </span>
             ))}
           </div>
+          <p className="mt-5 font-display text-2xl text-accent">
+            Identificamos {chips.length} pontos no seu diagnóstico
+          </p>
           <p className="mt-4 text-[15px] leading-relaxed text-foreground/80">{c.closing}</p>
         </Rise>
 
@@ -505,7 +514,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
                 disabled={enviando}
                 className="animate-soft-pulse mt-4 w-full rounded-xl bg-accent px-6 py-4 font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95 disabled:opacity-60"
               >
-                {enviando ? "Enviando..." : "Ver meu diagnóstico completo"}
+                {enviando ? "Enviando..." : `Ver meus ${chips.length} pontos identificados`}
               </button>
             </form>
           </Rise>
@@ -513,7 +522,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
 
         {/* Camada 9 */}
         {enviado && (
-          <div className="mt-6 flex animate-rise-in flex-col gap-3">
+          <div className="mt-6 flex animate-reward-pop flex-col gap-3">
             {c.ctas.map((cta) => (
               <a
                 key={cta.label}
