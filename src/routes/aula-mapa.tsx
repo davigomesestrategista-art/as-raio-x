@@ -29,8 +29,8 @@ function AulaMapa() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8 text-center">
-        <span className="mx-auto inline-flex items-center justify-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+      <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8">
+        <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <span className="text-accent" aria-hidden="true">●</span>
           Acesso liberado agora
         </span>
@@ -39,7 +39,7 @@ function AulaMapa() {
           Como eu abri <span className="text-accent">4 autopeças</span> em 4 anos começando do 0
         </h1>
 
-        <p className="mx-auto mt-5 max-w-md text-[15px] leading-relaxed text-foreground/80">
+        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-foreground/80">
           Nessa aula vou te mostrar o passo a passo que uso pra abrir loja sem
           chutar fornecedor, sem travar estoque parado e sem queimar caixa no
           primeiro mês.
@@ -67,7 +67,7 @@ function AulaMapa() {
           href={withOrigem(LINK_MAPA, "vsl_aspirante")}
           target="_blank"
           rel="noopener noreferrer"
-          className="animate-soft-pulse-cta mt-7 block w-full rounded-xl bg-cta px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-cta-foreground transition hover:brightness-95"
+          className="animate-soft-pulse mt-7 block w-full rounded-xl bg-accent px-6 py-4 text-center font-display text-[15px] uppercase tracking-tight text-accent-foreground transition hover:brightness-95"
         >
           Quero o Mapa
         </a>
