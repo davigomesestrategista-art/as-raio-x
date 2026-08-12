@@ -375,19 +375,13 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
       </div>
 
       <div className="mx-auto w-full max-w-xl px-5 pb-20 pt-8">
-        {/* Camada 1 + 2 */}
-        <Rise delay={d(0)} className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-foreground">
+        {/* Camada 1 + 2: contexto/legenda discreta */}
+        <Rise delay={d(0)} className="flex flex-wrap items-center gap-3">
+          <span className="border-l-2 border-accent pl-2 text-[13px] leading-snug text-foreground/80">
             {c.badge}
           </span>
           {c.urgency && (
-            <span
-              className={`inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${
-                c.urgency.tone === "hot"
-                  ? "bg-accent text-accent-foreground"
-                  : "border border-border bg-card text-muted-foreground"
-              }`}
-            >
+            <span className="border-l-2 border-accent pl-2 text-[13px] leading-snug text-accent">
               {c.urgency.text}
             </span>
           )}
@@ -429,7 +423,10 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
 
         {/* Camada 5 */}
         <Rise delay={d(3)} className="mt-6">
-          <div className="flex flex-wrap gap-2">
+          <p className="font-display text-xl text-accent">
+            Identificamos {chips.length} pontos no seu diagnóstico
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
             {chips.map((chip) => (
               <span
                 key={chip}
@@ -439,10 +436,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
               </span>
             ))}
           </div>
-          <p className="mt-5 font-display text-2xl text-accent">
-            Identificamos {chips.length} pontos no seu diagnóstico
-          </p>
-          <p className="mt-4 text-[15px] leading-relaxed text-foreground/80">{c.closing}</p>
+          <p className="mt-5 text-[15px] leading-relaxed text-foreground/80">{c.closing}</p>
         </Rise>
 
         {/* Camada condicional */}
@@ -457,14 +451,7 @@ function Result({ answers, onRestart }: { answers: Answers; onRestart: () => voi
         )}
 
         {/* Camada 6 */}
-        <Rise delay={d(extra ? 5 : 4)} className="mt-8 flex items-center gap-3">
-          {/* Espaço reservado para a foto real do Yago (substituir por src/assets/yago.jpg). */}
-          <div
-            className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border border-border bg-card font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground"
-            aria-hidden="true"
-          >
-            Foto
-          </div>
+        <Rise delay={d(extra ? 5 : 4)} className="mt-8">
           <p className="text-[13px] leading-snug text-foreground/70">{c.proofCaption}</p>
         </Rise>
 
