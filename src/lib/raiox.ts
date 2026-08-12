@@ -157,13 +157,20 @@ export function getResultContent(key: ResultKey): ResultContent {
                         },
                         closing: "O primeiro passo é saber o que comprar antes de gastar o primeiro real.",
                         proofCaption: "Material direto do time do Yago",
-                        anticipation: "Libere abaixo o acesso ao Mapa das Autopeças.",
+                        anticipation:
+                                    "Libere abaixo a aula gratuita e o acesso ao Mapa das Autopeças.",
                         ctas: [
+                          {
+                                        label: "Assistir a aula gratuita",
+                                        kind: "link",
+                                        href: withOrigem(LINK_VSL_MAPA, "raiox_aspirante"),
+                                        variant: "primary",
+                          },
                           {
                                         label: "Quero o Mapa",
                                         kind: "link",
                                         href: withOrigem(LINK_MAPA, "raiox_aspirante"),
-                                        variant: "primary",
+                                        variant: "ghost",
                           },
                                   ],
               };
