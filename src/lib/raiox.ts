@@ -5,6 +5,7 @@ export const LINK_PRIMEIRACOMPRA = "[LINK_PRIMEIRACOMPRA]";
 export const LINK_METODO_PRECIFICACAO = "[LINK_METODO_PRECIFICACAO]";
 export const LINK_GI = "[LINK_GI]";
 export const LINK_VSL_METODO = "[LINK_VSL_METODO]";
+export const LINK_VSL_MAPA = "[LINK_VSL_MAPA]";
 export const NUMERO_WHATSAPP = "[NUMERO]";
 
 export const withOrigem = (link: string, origem: string) =>
